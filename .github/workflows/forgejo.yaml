@@ -6,6 +6,7 @@ on:
             - main
         paths:
             - "images/forgejo/**"
+            - ".github/workflows/forgejo.yaml"
             - "!images/forgejo/README.md"
     workflow_dispatch:
 
