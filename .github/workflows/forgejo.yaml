@@ -65,7 +65,7 @@ jobs:
               with:
                   context: images/forgejo
                   # We use the same Dockerfile for all 3 jobs
-                  file: ./Dockerfile
+                  file: images/forgejo/Dockerfile
                   push: true
                   tags: ${{ steps.meta.outputs.tags }}
                   labels: ${{ steps.meta.outputs.labels }}
