@@ -6,7 +6,7 @@ if [ -f "/usr/local/bin/rst-render.py" ]; then
     set -- env FORGEJO__markup.rst__ENABLED="true" \
                FORGEJO__markup.rst__FILE_EXTENSIONS=".rst" \
                FORGEJO__markup.rst__RENDER_COMMAND="/usr/local/bin/rst-render.py" \
-               FORGEJO__markup.rst__IS_INPUT_FILE="true" \
+               FORGEJO__markup.rst__IS_INPUT_FILE="false" \
                "$@"
 fi
 
