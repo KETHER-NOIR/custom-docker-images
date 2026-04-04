@@ -33,7 +33,7 @@ jobs:
             - name: Get upstream version
               id: get_version
               run: |
-                  VERSION=$(grep '^FROM ' Dockerfile | awk -F':' '{print $2}')
+                  VERSION=$(grep '^FROM ' images/forgejo/Dockerfile | awk -F':' '{print $2}')
                   echo "UPSTREAM_VERSION=$VERSION" >> $GITHUB_ENV
 
             - name: Extract Docker metadata
