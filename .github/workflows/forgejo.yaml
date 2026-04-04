@@ -72,4 +72,4 @@ jobs:
                   # This is where the magic happens: passing matrix vars to the Dockerfile ARGs
                   build-args: |
                       INSTALL_RST=${{ matrix.install_rst }}
-                      INSTALL_VAULT=${{ matrix.install_envconsul }}
+                      INSTALL_ENVCONSUL=${{ matrix.install_envconsul }}
