@@ -27,4 +27,4 @@ RUN chmod +x /usr/local/bin/entrypoint-wrapper.sh
 
 # Default Forgejo entrypoint and command
 ENTRYPOINT ["/usr/local/bin/entrypoint-wrapper.sh"]
-CMD ["/usr/bin/entrypoint", "/bin/s6-svscan", "/etc/s6"] 
+CMD ["/usr/bin/entrypoint", "/usr/bin/s6-svscan", "/etc/s6"] 

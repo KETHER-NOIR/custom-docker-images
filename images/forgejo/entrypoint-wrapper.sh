@@ -3,10 +3,11 @@ set -e
 
 if [ -f "/usr/local/bin/rst-render.py" ]; then
     echo "Loading rst render related environment variables..."
-    export FORGEJO__markup.rst__ENABLED="true"
-    export FORGEJO__markup.rst__FILE_EXTENSIONS=".rst"
-    export FORGEJO__markup.rst__RENDER_COMMAND="/usr/local/bin/rst-render.py"
-    export FORGEJO__markup.rst__IS_INPUT_FILE="true"
+    set -- env FORGEJO__markup.rst__ENABLED="true" \
+               FORGEJO__markup.rst__FILE_EXTENSIONS=".rst" \
+               FORGEJO__markup.rst__RENDER_COMMAND="/usr/local/bin/rst-render.py" \
+               FORGEJO__markup.rst__IS_INPUT_FILE="true" \
+               "$@"
 fi
 
 if [ -f "/usr/local/bin/envconsul" ]; then
