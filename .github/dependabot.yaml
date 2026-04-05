@@ -1,0 +1,19 @@
+version: 2
+updates:
+    # 1. Watch the Forgejo Dockerfile
+    - package-ecosystem: "docker"
+      # This must be the directory containing the Dockerfile, starting with a slash
+      directory: "/images/forgejo"
+      schedule:
+          interval: "weekly"
+      # Optional: Automatically assign PRs to yourself
+      assignees:
+          - "kether-noir"
+
+    # 2. Watch the Caddy Dockerfile
+    - package-ecosystem: "docker"
+      directory: "/images/caddy"
+      schedule:
+          interval: "weekly"
+      assignees:
+          - "kether-noir"
