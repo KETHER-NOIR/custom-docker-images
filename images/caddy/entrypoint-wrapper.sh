@@ -33,4 +33,20 @@ if [ ! -n "$VAULT_TOKEN" ]; then
 fi
 
 echo "VAULT_TOKEN found. Starting Caddy..."
-exec envconsul -vault-addr="$VAULT_ADDR" -secret="$VAULT_PATH" -- caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
+
+if [ "$DEBUG" = "true" ]; then
+    echo "--- Shell Environment Variables ---"
+    env
+    echo "-----------------------------------"
+
+    # Use sh -c to execute env and then caddy, so we can see the env injected by envconsul
+    exec envconsul -vault-addr="$VAULT_ADDR" -secret="$VAULT_PATH" -no-prefix -- sh -c '
+        echo "--- Environment Variables inside Envconsul ---"
+        env
+        echo "----------------------------------------------"
+        exec caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
+    '
+fi
+
+# Normal startup without debug prints
+exec envconsul -vault-addr="$VAULT_ADDR" -secret="$VAULT_PATH" -no-prefix -- caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
