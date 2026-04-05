@@ -13,20 +13,7 @@ on:
 jobs:
     build-variants:
         runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                include:
-                    - variant: rst
-                      install_rst: true
-                      install_envconsul: false
 
-                    - variant: envconsul
-                      install_rst: false
-                      install_envconsul: true
-
-                    - variant: rst-envconsul
-                      install_rst: true
-                      install_envconsul: true
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
@@ -44,12 +31,12 @@ jobs:
                   images: kethernoir/forgejo-custom
                   flavor: |
                       latest=auto
-                      suffix=-${{ matrix.variant }},onlatest=true
+                      suffix=-rst,onlatest=true
                   tags: |
                       type=semver,pattern={{version}},value=${{ env.UPSTREAM_VERSION }}
                       type=semver,pattern={{major}}.{{minor}},value=${{ env.UPSTREAM_VERSION }}
                       type=semver,pattern={{major}},value=${{ env.UPSTREAM_VERSION }}
-                      
+
             - name: Set up Docker Buildx
               uses: docker/setup-buildx-action@v3
 
@@ -64,12 +51,7 @@ jobs:
               uses: docker/build-push-action@v5
               with:
                   context: images/forgejo
-                  # We use the same Dockerfile for all 3 jobs
                   file: images/forgejo/Dockerfile
                   push: true
                   tags: ${{ steps.meta.outputs.tags }}
                   labels: ${{ steps.meta.outputs.labels }}
-                  # This is where the magic happens: passing matrix vars to the Dockerfile ARGs
-                  build-args: |
-                      INSTALL_RST=${{ matrix.install_rst }}
-                      INSTALL_ENVCONSUL=${{ matrix.install_envconsul }}
