@@ -1,18 +1,27 @@
-name: Build Custom Forgejo Images
+name: Build Custom Caddy Images
 
 on:
     push:
         branches:
             - main
         paths:
-            - "images/forgejo/**"
-            - ".github/workflows/forgejo.yaml"
-            - "!images/forgejo/README.md"
+            - "images/caddy/**"
+            - ".github/workflows/caddy.yaml"
+            - "!images/caddy/README.md"
     workflow_dispatch:
 
 jobs:
-    build-rst:
+    build-variants:
         runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                include:
+                    - variant: cf
+                      install_envconsul: false
+
+                    - variant: cf-envconsul
+                      install_envconsul: true
 
         steps:
             - name: Checkout code
@@ -21,17 +30,17 @@ jobs:
             - name: Get upstream version
               id: get_version
               run: |
-                  VERSION=$(grep '^FROM ' images/forgejo/Dockerfile | awk -F':' '{print $2}')
+                  VERSION=$(grep '^ARG CADDY_VERSION=' images/caddy/Dockerfile | cut -d'=' -f2)
                   echo "UPSTREAM_VERSION=$VERSION" >> $GITHUB_ENV
 
             - name: Extract Docker metadata
               id: meta
               uses: docker/metadata-action@v5
               with:
-                  images: kethernoir/forgejo-custom
+                  images: kethernoir/caddy-custom
                   flavor: |
                       latest=auto
-                      suffix=-rst,onlatest=true
+                      suffix=-${{ matrix.variant }},onlatest=true
                   tags: |
                       type=semver,pattern={{version}},value=${{ env.UPSTREAM_VERSION }}
                       type=semver,pattern={{major}}.{{minor}},value=${{ env.UPSTREAM_VERSION }}
@@ -40,7 +49,6 @@ jobs:
             - name: Set up Docker Buildx
               uses: docker/setup-buildx-action@v3
 
-            # Login to your registry (e.g., Docker Hub or GitHub Container Registry)
             - name: Login to Docker Hub
               uses: docker/login-action@v3
               with:
@@ -50,8 +58,10 @@ jobs:
             - name: Build and push Docker image
               uses: docker/build-push-action@v5
               with:
-                  context: images/forgejo
-                  file: images/forgejo/Dockerfile
+                  context: images/caddy
+                  file: images/caddy/Dockerfile
                   push: true
                   tags: ${{ steps.meta.outputs.tags }}
                   labels: ${{ steps.meta.outputs.labels }}
+                  build-args: |
+                      INSTALL_ENVCONSUL=${{ matrix.install_envconsul }}
