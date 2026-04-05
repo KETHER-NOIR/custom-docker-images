@@ -1,12 +1,15 @@
 ARG CADDY_VERSION=2.11.2
-ARG ENVCONSUL_VERSION=0.13.4
-ARG INSTALL_ENVCONSUL=false
+
 
 FROM caddy:${CADDY_VERSION}-builder AS builder
 RUN xcaddy build \
     --with github.com/caddy-dns/cloudflare
 
 FROM caddy:${CADDY_VERSION}-alpine
+
+ARG ENVCONSUL_VERSION=0.13.4
+ARG INSTALL_ENVCONSUL=false
+
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 
 RUN if [ "$INSTALL_ENVCONSUL" = "true" ]; then \
