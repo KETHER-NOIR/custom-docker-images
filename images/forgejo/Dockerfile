@@ -1,9 +1,7 @@
 FROM codeberg.org/forgejo/forgejo:14.0.3
 
-USER root
-
-COPY entrypoint-wrapper.sh /usr/local/bin/entrypoint-wrapper.sh
-RUN chmod +x /usr/local/bin/entrypoint-wrapper.sh
+COPY rst-render.py /usr/local/bin/rst-render.py
+RUN chmod +x /usr/local/bin/rst-render.py
 RUN apk add --no-cache py3-docutils
 
 ENV FORGEJO__markup.rst__ENABLED="true"

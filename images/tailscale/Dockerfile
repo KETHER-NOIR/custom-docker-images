@@ -25,6 +25,8 @@ FROM dhi.io/tailscale:${TAILSCALE_VERSION}
 COPY --from=builder /usr/bin/curl /usr/bin/curl
 COPY --from=builder /usr/bin/jq /usr/bin/jq
 COPY --from=builder /usr/local/bin/envconsul /usr/local/bin/envconsul
+
 COPY entrypoint-wrapper.sh /entrypoint-wrapper.sh
+RUN chmod +x /entrypoint-wrapper.sh
 
 ENTRYPOINT ["/entrypoint-wrapper.sh"]
