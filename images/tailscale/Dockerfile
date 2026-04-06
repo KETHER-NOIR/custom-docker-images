@@ -1,6 +1,6 @@
-ARG VERSION_TAILSCALE=1.94.2
+ARG TAILSCALE_VERSION=1.94.2
 
-FROM dhi.io/tailscale:${VERSION_TAILSCALE}-dev AS builder
+FROM dhi.io/tailscale:${TAILSCALE_VERSION}-dev AS builder
 
 ARG ENVCONSUL_VERSION=0.13.4
 
@@ -17,7 +17,7 @@ RUN wget https://releases.hashicorp.com/envconsul/${ENVCONSUL_VERSION}/envconsul
     && unzip envconsul_${ENVCONSUL_VERSION}_linux_amd64.zip \
     && mv envconsul /usr/local/bin/
 
-FROM dhi.io/tailscale:${VERSION_TAILSCALE}
+FROM dhi.io/tailscale:${TAILSCALE_VERSION}
 
 # Copy the required runtime binaries from the builder
 # Since the hardened image lacks a package manager (apt-get),
