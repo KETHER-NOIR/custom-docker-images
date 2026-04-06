@@ -1,31 +1,18 @@
-name: Build Custom Caddy Images
+name: Tailscale
 
 on:
     push:
         branches:
             - main
         paths:
-            - "images/caddy/**"
-            - ".github/workflows/caddy.yaml"
-            - "!images/caddy/README.md"
+            - "images/tailscale/**"
+            - ".github/workflows/tailscale.yaml"
+            - "!images/tailscale/README.md"
     workflow_dispatch:
 
 jobs:
-    build-variants:
+    build-tailscale:
         runs-on: ubuntu-latest
-        permissions:
-            contents: read
-            security-events: write
-            id-token: write
-
-        strategy:
-            matrix:
-                include:
-                    - variant: cf
-                      install_envconsul: false
-
-                    - variant: cf-envconsul
-                      install_envconsul: true
 
         steps:
             - name: Checkout code
@@ -34,17 +21,17 @@ jobs:
             - name: Get upstream version
               id: get_version
               run: |
-                  VERSION=$(grep '^ARG CADDY_VERSION=' images/caddy/Dockerfile | cut -d'=' -f2)
+                  VERSION=$(grep '^ARG TAILSCALE_VERSION=' images/tailscale/Dockerfile | cut -d'=' -f2)
                   echo "UPSTREAM_VERSION=$VERSION" >> $GITHUB_ENV
 
             - name: Extract Docker metadata
               id: meta
               uses: docker/metadata-action@v5
               with:
-                  images: kethernoir/caddy-custom
+                  images: kethernoir/tailscale-custom
                   flavor: |
                       latest=auto
-                      suffix=-${{ matrix.variant }},onlatest=true
+                      suffix=-envconsul,onlatest=true
                   tags: |
                       type=semver,pattern={{version}},value=${{ env.UPSTREAM_VERSION }}
                       type=semver,pattern={{major}}.{{minor}},value=${{ env.UPSTREAM_VERSION }}
@@ -59,27 +46,26 @@ jobs:
             - name: Login to Docker Hub
               uses: docker/login-action@v3
               with:
-                  username: ${{ secrets.DOCKERHUB_USERNAME }}
-                  password: ${{ secrets.DOCKERHUB_TOKEN }}
+                  username: ${{ secrets.DOCKER_USERNAME }}
+                  password: ${{ secrets.DOCKER_PASSWORD }}
 
-            - name: Build Docker image (local, for scanning)
+            - name: Build Docker image for scanning
               uses: docker/build-push-action@v5
               with:
-                  context: images/caddy
-                  file: images/caddy/Dockerfile
+                  context: images/tailscale
+                  file: images/tailscale/Dockerfile
+                  builder: ${{ steps.buildx.outputs.name }}
                   push: false
                   load: true
                   tags: ${{ steps.meta.outputs.tags }}
                   labels: ${{ steps.meta.outputs.labels }}
-                  build-args: |
-                      INSTALL_ENVCONSUL=${{ matrix.install_envconsul }}
 
             - name: Scan image with Trivy
               uses: aquasecurity/trivy-action@master
               with:
-                  image-ref: kethernoir/caddy-custom:${{ env.UPSTREAM_VERSION }}-${{ matrix.variant }}
+                  image-ref: kethernoir/tailscale-custom:${{ env.UPSTREAM_VERSION }}-envconsul
                   format: sarif
-                  output: trivy-${{ matrix.variant }}.sarif
+                  output: trivy-envconsul.sarif
                   severity: CRITICAL,HIGH
                   exit-code: "0"
 
@@ -87,20 +73,18 @@ jobs:
               if: always()
               uses: github/codeql-action/upload-sarif@v3
               with:
-                  sarif_file: trivy-${{ matrix.variant }}.sarif
-                  category: trivy-${{ matrix.variant }}
+                  sarif_file: trivy-envconsul.sarif
+                  category: trivy-envconsul
 
             - name: Push Docker image
-              id: push
               uses: docker/build-push-action@v5
               with:
-                  context: images/caddy
-                  file: images/caddy/Dockerfile
+                  context: images/tailscale
+                  file: images/tailscale/Dockerfile
+                  builder: ${{ steps.buildx.outputs.name }}
                   push: true
                   tags: ${{ steps.meta.outputs.tags }}
                   labels: ${{ steps.meta.outputs.labels }}
-                  build-args: |
-                      INSTALL_ENVCONSUL=${{ matrix.install_envconsul }}
 
             - name: Sign image with Cosign
               env:
