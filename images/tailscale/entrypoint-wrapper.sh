@@ -1,9 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 if [ ! -f "/usr/local/bin/envconsul" ]; then
     echo "No envconsul found. Starting Tailscale directly..."
-    exec sh -c "(sleep 5; tailscale web --listen 0.0.0.0:$PORT_TAILSCALE_UI) &
+    exec bash -c "sleep 5; tailscale web --listen 0.0.0.0:$PORT_TAILSCALE_UI &
             exec /usr/local/bin/containerboot"
 fi
 
@@ -33,22 +33,20 @@ if [ ! -n "$VAULT_TOKEN" ]; then
     exit 1
 fi
 
-echo "VAULT_TOKEN found. Starting Caddy..."
+echo "VAULT_TOKEN found. Starting..."
 
 if [ "$DEBUG" = "true" ]; then
     echo "--- Shell Environment Variables ---"
     env
-    echo "-----------------------------------"
+    echo "---Subprocess Environment Variables ---"
 
-    # Use sh -c to execute env and then caddy, so we can see the env injected by envconsul
-    exec envconsul -vault-addr="$VAULT_ADDR" -secret="$VAULT_PATH" -no-prefix -- sh -c '
-        echo "--- Environment Variables inside Envconsul ---"
+    exec envconsul -vault-addr="$VAULT_ADDR" -secret="$VAULT_PATH" -no-prefix -- bash -c "
         env
-        echo "----------------------------------------------"
-        exec caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
-    '
+        sleep 5; tailscale web --listen 0.0.0.0:$PORT_TAILSCALE_UI &
+        exec /usr/local/bin/containerboot
+    "
+    
 fi
 
-# Normal startup without debug prints
-exec envconsul -vault-addr="$VAULT_ADDR" -secret="$VAULT_PATH" -no-prefix -- sh -c "(sleep 5; tailscale web --listen 0.0.0.0:$PORT_TAILSCALE_UI) &
+exec envconsul -vault-addr="$VAULT_ADDR" -secret="$VAULT_PATH" -no-prefix -- bash -c "sleep 5; tailscale web --listen 0.0.0.0:$PORT_TAILSCALE_UI &
             exec /usr/local/bin/containerboot"
