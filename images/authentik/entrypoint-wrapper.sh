@@ -1,11 +1,6 @@
 #!/bin/sh
 set -e
 
-if [ ! -f "/usr/local/bin/envconsul" ]; then
-    echo "No envconsul found. Starting Caddy directly..."
-    exec "$@"
-fi
-
 vault_init() {
     echo "Server connection environment variables precheck..."
     if [ ! -n "$VAULT_ADDR" ]; then
