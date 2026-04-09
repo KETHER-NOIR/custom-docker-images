@@ -11,8 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     unzip \
     curl \
-    jq \
-    && rm -rf /var/lib/apt/lists/*
+    jq
 
 # Download and extract envconsul in the builder stage
 RUN wget https://releases.hashicorp.com/envconsul/${ENVCONSUL_VERSION}/envconsul_${ENVCONSUL_VERSION}_linux_amd64.zip \

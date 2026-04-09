@@ -8,12 +8,13 @@ RUN chmod +x /entrypoint-wrapper.sh
 
 RUN apk add --no-cache wget unzip jq curl
 
-RUN wget https://releases.hashicorp.com/envconsul/${ENVCONSUL_VERSION}/envconsul_${ENVCONSUL_VERSION}_linux_amd64.zip
-RUN unzip envconsul_${ENVCONSUL_VERSION}_linux_amd64.zip -d /tmp/envconsul
-RUN mv /tmp/envconsul/envconsul /usr/local/bin/
-RUN rm -rf /tmp/envconsul
-RUN rm -rf /home/dockhand/.wget-hsts
-RUN rm envconsul_${ENVCONSUL_VERSION}_linux_amd64.zip
-RUN apk del wget unzip
+RUN wget https://releases.hashicorp.com/envconsul/${ENVCONSUL_VERSION}/envconsul_${ENVCONSUL_VERSION}_linux_amd64.zip && \
+    unzip envconsul_${ENVCONSUL_VERSION}_linux_amd64.zip -d /tmp/envconsul && \
+    mv /tmp/envconsul/envconsul /usr/local/bin/ && \
+    rm -rf /tmp/envconsul && \
+    rm -rf /home/dockhand/.wget-hsts && \
+    rm envconsul_${ENVCONSUL_VERSION}_linux_amd64.zip && \
+    apk del wget unzip
 
-ENTRYPOINT ["/entrypoint-wrapper.sh", "/sbin/tini", "--", "/usr/local/bin/docker-entrypoint.sh"]
+ENTRYPOINT ["/entrypoint-wrapper.sh"]
+CMD ["/sbin/tini", "--", "/usr/local/bin/docker-entrypoint.sh"]
