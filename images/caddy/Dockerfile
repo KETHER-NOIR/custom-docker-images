@@ -1,9 +1,14 @@
 ARG CADDY_VERSION=2.11.2
-
+# ---------------------------------------------------------------
 FROM caddy:${CADDY_VERSION}-builder AS builder
-RUN xcaddy build \
-    --with github.com/caddy-dns/cloudflare
+COPY xcaddy_build.sh xcaddy_build.sh
+RUN chmod +x xcaddy_build.sh
 
+ARG INSTALL_REPLACE_RESPONSE=false
+ARG INSTALL_CLOUDFLARE=false
+RUN xcaddy_build.sh
+
+# ---------------------------------------------------------------
 FROM caddy:${CADDY_VERSION}-alpine
 
 ARG ENVCONSUL_VERSION=0.13.4

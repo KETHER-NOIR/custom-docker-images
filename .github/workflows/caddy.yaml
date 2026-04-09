@@ -22,10 +22,19 @@ jobs:
             matrix:
                 include:
                     - variant: cf
+                      install_cloudflare: true
+                      install_replace_response: false
                       install_envconsul: false
 
                     - variant: cf-envconsul
+                      install_cloudflare: true
+                      install_replace_response: false
                       install_envconsul: true
+
+                    - variant: cf-rr-envconsul
+                      install_cloudflare: true
+                      install_replace_response: true
+                      install_envconsul: true                    
 
         steps:
             - name: Checkout code
@@ -72,6 +81,8 @@ jobs:
                   tags: ${{ steps.meta.outputs.tags }}
                   labels: ${{ steps.meta.outputs.labels }}
                   build-args: |
+                      INSTALL_CLOUDFLARE=${{ matrix.install_cloudflare }}
+                      INSTALL_REPLACE_RESPONSE=${{ matrix.install_replace_response }}
                       INSTALL_ENVCONSUL=${{ matrix.install_envconsul }}
 
             - name: Scan image with Trivy
@@ -100,6 +111,8 @@ jobs:
                   tags: ${{ steps.meta.outputs.tags }}
                   labels: ${{ steps.meta.outputs.labels }}
                   build-args: |
+                      INSTALL_CLOUDFLARE=${{ matrix.install_cloudflare }}
+                      INSTALL_REPLACE_RESPONSE=${{ matrix.install_replace_response }}
                       INSTALL_ENVCONSUL=${{ matrix.install_envconsul }}
 
             - name: Sign image with Cosign
