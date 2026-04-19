@@ -1,4 +1,4 @@
-FROM codeberg.org/forgejo/forgejo:14.0.4
+FROM codeberg.org/forgejo/forgejo:15.0.0
 
 COPY rst-render.py /usr/local/bin/rst-render.py
 RUN chmod +x /usr/local/bin/rst-render.py
