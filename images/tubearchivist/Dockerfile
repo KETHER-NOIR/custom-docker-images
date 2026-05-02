@@ -20,4 +20,4 @@ COPY entrypoint-wrapper.sh /entrypoint-wrapper.sh
 RUN chmod +x /entrypoint-wrapper.sh
 
 ENTRYPOINT ["/entrypoint-wrapper.sh"]
-CMD ["/app/run"]
+CMD ["/bin/tini", "--", "./run.sh"]
