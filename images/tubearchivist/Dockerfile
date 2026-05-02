@@ -4,8 +4,6 @@ FROM bbilly1/tubearchivist:${TUBEARCHIVIST_VERSION}
 
 ARG ENVCONSUL_VERSION=0.13.4
 
-USER root
-
 RUN apt-get update && \
     apt-get install -y wget unzip jq curl && \
     wget https://releases.hashicorp.com/envconsul/${ENVCONSUL_VERSION}/envconsul_${ENVCONSUL_VERSION}_linux_amd64.zip && \
@@ -20,8 +18,6 @@ RUN apt-get update && \
 
 COPY entrypoint-wrapper.sh /entrypoint-wrapper.sh
 RUN chmod +x /entrypoint-wrapper.sh
-
-USER tubearchivist
 
 ENTRYPOINT ["/entrypoint-wrapper.sh"]
 CMD ["/app/run"]
